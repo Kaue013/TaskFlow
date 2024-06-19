@@ -1,24 +1,218 @@
-# Compiled class file
-*.class
+import java.io.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
-# Log file
-*.log
+public class TaskManagerApp {
+    private static List<Task> tasks = new ArrayList<>();
+    private static final String FILENAME = "tasks.txt";
 
-# BlueJ files
-*.ctxt
+    public static void main(String[] args) {
+        tasks = loadSavedTasksFromFile(); // Carregar as anotações salvas
+        Scanner scanner = new Scanner(System.in);
+        boolean exit = false;
+        while (!exit) {
+            System.out.println("\n1. Adicionar Anotação");
+            System.out.println("2. Editar Anotação");
+            System.out.println("3. Excluir Anotação");
+            System.out.println("4. Visualizar Anotações");
+            System.out.println("5. Anotações Salvas");
+            System.out.println("6. Sair");
+            System.out.print("Escolha uma opção: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Limpar o buffer de entrada
+            switch (choice) {
+                case 1:
+                    addTask(scanner);
+                    break;
+                case 2:
+                    editTask(scanner);
+                    break;
+                case 3:
+                    deleteTask(scanner);
+                    break;
+                case 4:
+                    listTasks();
+                    break;
+                case 5:
+                    listSavedTasks();
+                    break;
+                case 6:
+                    saveTasksToFile(); // Salvar as anotações antes de sair
+                    System.out.println("Saindo...");
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        }
+    }
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+    private static void addTask(Scanner scanner) {
+        System.out.print("Nome da Anotação: ");
+        String title = scanner.nextLine();
+        System.out.print("Descrição: ");
+        String description = scanner.nextLine();
+        LocalDate creationDate = LocalDate.now();
+        tasks.add(new Task(title, description, creationDate));
+        System.out.println("Anotação adicionada.");
+        listTasks(); // Exibir anotações após adicionar uma nova tarefa
+    }
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+    private static void editTask(Scanner scanner) {
+        listTasks();
+        System.out.print("Escolha o número da Anotação que deseja editar: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Limpar o buffer de entrada
+        if (choice > 0 && choice <= tasks.size()) {
+            Task task = tasks.get(choice - 1);
+            System.out.println("Editar Anotação: " + task.getTitle());
+            System.out.println("1. Editar Descrição");
+            System.out.println("2. Editar Nome");
+            System.out.println("3. Cancelar");
+            System.out.print("Escolha uma opção: ");
+            int option = scanner.nextInt();
+            scanner.nextLine(); // Limpar o buffer de entrada
+            switch (option) {
+                case 1:
+                    System.out.print("Nova Descrição: ");
+                    task.setDescription(scanner.nextLine());
+                    System.out.println("Descrição editada.");
+                    break;
+                case 2:
+                    System.out.print("Novo Nome: ");
+                    task.setTitle(scanner.nextLine());
+                    System.out.println("Nome editado.");
+                    break;
+                case 3:
+                    System.out.println("Edição cancelada.");
+                    break;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } else {
+            System.out.println("Número de Anotação inválido.");
+        }
+    }
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+    private static void deleteTask(Scanner scanner) {
+        listTasks();
+        System.out.print("Escolha o número da Anotação que deseja excluir: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Limpar o buffer de entrada
+        if (choice > 0 && choice <= tasks.size()) {
+            Task task = tasks.get(choice - 1);
+            System.out.print("Tem certeza que deseja excluir a Anotação '" + task.getTitle() + "'? (sim/não): ");
+            String confirmation = scanner.nextLine();
+            if (confirmation.equalsIgnoreCase("sim")) {
+                tasks.remove(task);
+                System.out.println("Anotação excluída.");
+            } else {
+                System.out.println("Exclusão cancelada.");
+            }
+        } else {
+            System.out.println("Número de Anotação inválido.");
+        }
+    }
+
+    private static void listTasks() {
+        if (tasks.isEmpty()) {
+            System.out.println("Nenhuma anotação cadastrada.");
+        } else {
+            System.out.println("Anotações:");
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + ". " + tasks.get(i));
+            }
+        }
+    }
+
+    private static void listSavedTasks() {
+        if (tasks.isEmpty()) {
+            System.out.println("Nenhuma anotação salva.");
+        } else {
+            System.out.println("Anotações Salvas:");
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + ". " + tasks.get(i));
+            }
+        }
+    }
+
+    private static List<Task> loadSavedTasksFromFile() {
+        List<Task> savedTasks = new ArrayList<>();
+        File file = new File(FILENAME);
+        if (!file.exists()) {
+            System.out.println("Arquivo de anotações não encontrado.");
+            return savedTasks;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILENAME))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(";");
+                if (parts.length == 3) {
+                    String title = parts[0];
+                    String description = parts[1];
+                    LocalDate creationDate = LocalDate.parse(parts[2]);
+                    savedTasks.add(new Task(title, description, creationDate));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao carregar as anotações do arquivo.");
+        }
+        return savedTasks;
+    }
+
+    private static void saveTasksToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILENAME))) {
+            for (Task task : tasks) {
+                writer.write(task.getTitle() + ";" + task.getDescription() + ";" + task.getCreationDate());
+                writer.newLine();
+            }
+            System.out.println("Anotações salvas em " + FILENAME);
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar as anotações em " + FILENAME);
+        }
+    }
+
+    static class Task {
+        private String title;
+        private String description;
+        private LocalDate creationDate;
+
+        public Task(String title, String description, LocalDate creationDate) {
+            this.title = title;
+            this.description = description;
+            this.creationDate = creationDate;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public LocalDate getCreationDate() {
+            return creationDate;
+        }
+
+        public void setCreationDate(LocalDate creationDate) {
+            this.creationDate = creationDate;
+        }
+
+        @Override
+        public String toString() {
+            return "Título: " + title + ", Descrição: " + description + ", Data de Criação: " + creationDate;
+        }
+    }
+}
