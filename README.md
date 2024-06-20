@@ -1,6 +1,6 @@
 # TaskFlow
 A proposta é criar uma aplicação que facilite a organização e o monitoramento das tarefas diárias dos usuários, promovendo um gerenciamento eficiente do tempo e das atividades.
-![2](https://github.com/Kaue013/TaskFlow/assets/96543696/b2bcfc38-d937-4faf-abd4-3d3e7933fcb2)
+![1](https://github.com/Kaue013/TaskFlow/assets/96543696/5c465d67-bd3a-4677-8332-69a2a6b5ca8a)
 ![2](https://github.com/Kaue013/TaskFlow/assets/96543696/d2df4fe7-b54a-43c3-8e89-8c70b89e5f87)
 ![3](https://github.com/Kaue013/TaskFlow/assets/96543696/1b22409d-44ed-44d3-84d0-1d4d7b7a0a2e)
 ![4](https://github.com/Kaue013/TaskFlow/assets/96543696/a90afa9d-731e-47eb-ad9b-c01da5507dbb)
